@@ -1,0 +1,25 @@
+services:
+  app:
+    container_name: app
+    build: .
+    volumes:
+      - ./app.py:/app/app.py
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: localhost:24224
+    depends_on:
+      - fluent-bit
+  fluent-bit:
+    container_name: fluent-bit
+    image: grafana/fluent-bit-plugin-loki:latest
+    environment:
+      - LOKI_HOST=changeme
+      - LOKI_USER=changeme
+      - LOKI_PASSWORD=changeme 
+    volumes:
+      - ./fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+      - ./parser.conf:/fluent-bit/etc/parsers.conf
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
